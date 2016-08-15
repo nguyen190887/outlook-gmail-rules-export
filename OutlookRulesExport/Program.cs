@@ -321,6 +321,9 @@ namespace OutlookRulesExport
             // swap backslash for forwardslash to play nice with google
             path = path.Replace("\\", "/");
 
+            // remove Inbox/
+            path = path.Replace("Inbox/", "");
+
             return path;
         }
 
