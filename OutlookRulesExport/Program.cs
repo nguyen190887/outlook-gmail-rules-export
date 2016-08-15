@@ -183,14 +183,7 @@ namespace OutlookRulesExport
             if (r.Conditions.Subject.Enabled)
             {
                 string[] temp = r.Conditions.Subject.Text;
-
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    mr.Subject += temp[i];
-
-                    if (i != temp.Length - 1)
-                        mr.Subject += " OR ";
-                }
+                mr.Subject = string.Format("({0})", string.Join(") OR (", temp));
             }
         }
 
@@ -256,7 +249,7 @@ namespace OutlookRulesExport
         /// </summary>
         /// <param name="r"></param>
         /// <param name="mr"></param>
-        private static void ParseFromAddresses(Rule r, MyRule mr)
+        private static void ParseFromAddresses(Rule r, MyRule mr, string ruleSeparator = " OR ")
         {
             if (r.Conditions.From.Recipients.Count > 0)
             {
@@ -294,7 +287,7 @@ namespace OutlookRulesExport
                         }
                         else
                         {
-                            mr.FromAddress += "," + temp;
+                            mr.FromAddress += ruleSeparator + temp;
                         }
                     }
                 }
@@ -323,7 +316,7 @@ namespace OutlookRulesExport
         public static string CleanRuleActions(string path, String storeName)
         {
             // remove the store name from the action path
-            path =  path.Replace("\\\\"+storeName+"\\", String.Empty);
+            path = path.Replace("\\\\" + storeName + "\\", String.Empty);
 
             // swap backslash for forwardslash to play nice with google
             path = path.Replace("\\", "/");
@@ -365,7 +358,7 @@ namespace OutlookRulesExport
                     XAttribute at1b = new XAttribute("value", r.FromAddress);
                     el1a.Add(at1b);
                     atom.ElementExtensions.Add(el1a);
-                    
+
                     conditionSet = true;
                 }
 
@@ -377,7 +370,7 @@ namespace OutlookRulesExport
                     XAttribute at4b = new XAttribute("value", r.Subject);
                     el4a.Add(at4b);
                     atom.ElementExtensions.Add(el4a);
-                    
+
                     conditionSet = true;
                 }
 
@@ -431,7 +424,7 @@ namespace OutlookRulesExport
 
             XmlWriter xw = XmlWriter.Create(sw, settings);
 
-            Atom10FeedFormatter atomFormatter = new Atom10FeedFormatter(feed);            
+            Atom10FeedFormatter atomFormatter = new Atom10FeedFormatter(feed);
             atomFormatter.WriteTo(xw);
 
             xw.Flush();
